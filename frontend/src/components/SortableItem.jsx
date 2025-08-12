@@ -1,0 +1,30 @@
+import { useSortable} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+
+export const SortableItem = ({ item, isSelected, toggleSelection }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  };
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-2 p-2 border rounded 
+      bg-white shadow-sm hover:bg-gray-50"
+    >
+      <input
+        type="checkbox"
+        checked={isSelected}
+        onChange={() => toggleSelection(item.id)}
+      />
+      <span className="flex-1 cursor-move" {...attributes} {...listeners}>
+        {item.name}
+      </span>
+    </li>
+  );
+};
