@@ -73,6 +73,7 @@ const [searchVal, setSearchVal] = useState(() => {
 }, [loaderRef]);
 
   const toggleSelection = async (id) => {
+    console.log(searchVal)
     await dispatch(selectItems({id, search: searchVal})).unwrap();
   };
 

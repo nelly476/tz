@@ -11,15 +11,12 @@ export const SortableItem = ({ item, isSelected, toggleSelection, dragDisabled }
     cursor: "pointer"
   };
 
-   const dragProps = dragDisabled ? {} : { ...attributes, ...listeners };
-
   return (
      <li
       ref={setNodeRef}
       style={style}
       className={`flex items-center gap-2 p-2 border rounded bg-white shadow-sm
-                  ${dragDisabled ? 'cursor-default' : 'cursor-grab hover:bg-gray-50'}`}
-      {...dragProps}
+      ${dragDisabled ? 'cursor-default' : 'cursor-grab hover:bg-gray-50'}`}
     >
       <input
         type="checkbox"

@@ -65,8 +65,9 @@ export const getItems = (req, res) => {
 
 export const updateSelection = (req, res) => {
   const {id, search} = req.body;
+  // console.log(search)
  
-  if (search) {
+  if (search.length > 0) {
     sessionStore.searchData = sessionStore.searchData.map(item => {
       if (item.id === id) {
         return {...item, isSelected: !item.isSelected}
@@ -88,7 +89,7 @@ export const updateSelection = (req, res) => {
     res.json(sessionStore.searchData) 
 
 } else {
-             
+            // console.log(sessionStore.data)   
     sessionStore.data = sessionStore.data.map(item => {
     if (item.id === id) {
       return {...item, isSelected: !item.isSelected}
@@ -98,8 +99,8 @@ export const updateSelection = (req, res) => {
     
   })
 
+
   res.json(sessionStore.data)
-  
 }
   }
 
