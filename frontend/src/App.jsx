@@ -29,8 +29,6 @@ const [searchVal, setSearchVal] = useState(() => {
   // читаем из localStorage один раз при инициализации
   return localStorage.getItem('searchVal') ?? '';
 });
-
-  const [hasMore, setHasMore] = useState(true);
   const loaderRef = useRef(null);
   const isFirstLoad = useRef(true);
 
@@ -52,7 +50,7 @@ const [searchVal, setSearchVal] = useState(() => {
   }, [offset, dispatch]);
 
   useEffect(() => {
-  if (!loaderRef.current || !hasMore) return;
+  if (!loaderRef.current) return;
 
   const observer = new IntersectionObserver(
     (entries) => {
@@ -72,7 +70,7 @@ const [searchVal, setSearchVal] = useState(() => {
   observer.observe(loaderRef.current);
 
   return () => observer.disconnect();
-}, [loaderRef, hasMore]);
+}, [loaderRef]);
 
   const toggleSelection = async (id) => {
     await dispatch(selectItems({id, search: searchVal})).unwrap();
@@ -87,8 +85,6 @@ const [searchVal, setSearchVal] = useState(() => {
       const newIndex = storeItems.findIndex((i) => i.id === over.id);
       const reorderedList = arrayMove(storeItems, oldIndex, newIndex)
 
-      // console.log(reorderedList)
-      // console.log(storeItems)
       dispatch(sortItems({reorderedList, oldIndex, newIndex}))
     }
   };
@@ -134,11 +130,9 @@ const [searchVal, setSearchVal] = useState(() => {
       <div className="mt-4 text-sm text-gray-500">
       </div>
 
-       {hasMore && (
         <div ref={loaderRef} className="text-center py-4 text-gray-500">
           Загрузка...
         </div>
-      )}
 
     </div>
   );

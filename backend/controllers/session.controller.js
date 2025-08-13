@@ -12,7 +12,6 @@ function getPaginatedData(offset, limit, search) {
   if (search) {
     data = [...items].filter(item => item.name.includes(search)).map(item => {
       const sessionStoreItem = sessionStore.data.find(i => i.id === item.id)
-      // const selectedItemFromSearch = sessionStore.selectedIdsFromSearch.find(i => i.id === item.id)
       if (sessionStoreItem) {
         return sessionStoreItem
       } else {
@@ -44,14 +43,11 @@ export const getItems = (req, res) => {
   offset = Number(offset)
   limit = Number(limit)
 
-  console.log(offset)
-
   let paginated = getPaginatedData(offset, limit, search)
 
   if (!search) {
       if (sessionStore.data.length <= offset) {
     sessionStore.data = [...sessionStore.data, ...paginated]
-    // console.log(sessionStore.data)
   }
   } else {
     if (offset === 0) {
@@ -60,7 +56,6 @@ export const getItems = (req, res) => {
 
     if (sessionStore.searchData.length <= offset) {
     sessionStore.searchData = [...sessionStore.searchData, ...paginated]
-    // console.log(sessionStore.data)
   }
   }
 
@@ -72,9 +67,7 @@ export const updateSelection = (req, res) => {
   const {id, search} = req.body;
  
   if (search) {
-    //  console.log(1)
     sessionStore.searchData = sessionStore.searchData.map(item => {
-      // console.log(id)
       if (item.id === id) {
         return {...item, isSelected: !item.isSelected}
       } else {
@@ -92,16 +85,12 @@ export const updateSelection = (req, res) => {
 
       }
     }
-
-    // console.log(sessionStore.selectedIdsFromSearch)
-
     res.json(sessionStore.searchData) 
 
 } else {
              
     sessionStore.data = sessionStore.data.map(item => {
     if (item.id === id) {
-      // console.log(item)
       return {...item, isSelected: !item.isSelected}
     } else {
       return item
