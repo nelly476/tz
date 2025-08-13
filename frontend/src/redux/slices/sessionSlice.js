@@ -11,27 +11,18 @@ export const getItems = createAsyncThunk(
   }
 );
 
-export const selectItems = createAsyncThunk('items/select', async (id) => {
-  const res = await axiosInstance.post('/select', { id });
+export const selectItems = createAsyncThunk('items/select', async ({id, search}) => {
+  const res = await axiosInstance.post('/select', { id, search });
   return res.data; 
 });
 
 export const sortItems = createAsyncThunk(
   'items/sort',
-  async ({ reorderedList, oldIndex, newIndex }) => {
-    const res = await axiosInstance.post('/sort', {
-      reorderedList,
-      oldIndex,
-      newIndex
-    });
+  async ({ reorderedList}) => {
+    const res = await axiosInstance.post('/sort', { reorderedList });
     return res.data; 
   }
 );
-
-export const fetchSessionState = createAsyncThunk('session/fetchState', async () => {
-  const res = await axiosInstance.get('/sessionState');
-  return res.data; // { selectedIds: [...], sortedIds: [...] }
-});
 
 
 const sessionSlice = createSlice({
@@ -64,6 +55,7 @@ const sessionSlice = createSlice({
       .addCase(selectItems.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.data = action.payload
+        
       })
       .addCase(selectItems.rejected, (state) => {
         state.status = 'failed';

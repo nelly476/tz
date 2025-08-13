@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import './App.css';
 import { getItems, selectItems, sortItems } from './redux/slices/sessionSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { SortableItem } from './components/SortableItem';
+import { SearchInput } from './components/SearchInput';
 import {
   DndContext,
   closestCenter,
@@ -24,12 +25,14 @@ const App = () => {
   const dispatch = useDispatch();
   const storeItems = useSelector((state) => state.sessionSlice.data);
   const [offset, setOffset] = useState(0);
+const [searchVal, setSearchVal] = useState(() => {
+  // читаем из localStorage один раз при инициализации
+  return localStorage.getItem('searchVal') ?? '';
+});
 
   const [hasMore, setHasMore] = useState(true);
   const loaderRef = useRef(null);
   const isFirstLoad = useRef(true);
-  // const selectedIds = useSelector(state => state.sessionSlice.selectedIds)
-  // const [selectedIds, setSelectedIds] = useState([]);
 
 
   const sensors = useSensors(
@@ -40,7 +43,12 @@ const App = () => {
   );
 
   useEffect(() => {
-    dispatch(getItems({offset: offset}))
+  localStorage.setItem('searchVal', searchVal);
+}, [searchVal]);
+
+  useEffect(() => {
+    dispatch(getItems({offset: offset, search: searchVal}))
+   
   }, [offset, dispatch]);
 
   useEffect(() => {
@@ -67,12 +75,9 @@ const App = () => {
 }, [loaderRef, hasMore]);
 
   const toggleSelection = async (id) => {
-    try {
-    await dispatch(selectItems(id)).unwrap();
-    // await dispatch(getItems(offset));
-  } catch (err) {
-    console.error('Ошибка при выборе элемента:', err);
-  }
+    await dispatch(selectItems({id, search: searchVal})).unwrap();
+      
+  
   };
 
   const handleDragEnd = async (event) => {
@@ -88,24 +93,27 @@ const App = () => {
     }
   };
 
-  // const handleSelectAll = () => {
-  //   if (selectedIds.length === storeItems.length) {
-  //     setSelectedIds([]);
-  //   } else {
-  //     setSelectedIds(storeItems.map((item) => item.id));
-  //   }
-  // };
+   const handleSearch = useCallback((query) => {
+    // Сбрасываем offset при новом поиске
+    dispatch(getItems({ offset: 0, limit: 20, search: query }));
+     if (searchVal === "") {
+      setOffset(0)
+     }
+  }, [dispatch]);
+
 
   return (
     <div className="p-4 max-w-md mx-auto border rounded-lg shadow bg-gray-50">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-xl font-semibold">Список с drag-and-drop</h2>
-        {/* <button
-          onClick={handleSelectAll}
-          className="text-sm text-blue-500 hover:underline"
-        >
-          {selectedIds.length === storeItems.length ? 'Снять все' : 'Выбрать все'}
-        </button> */}
+           <SearchInput
+      placeholder="Найти элементы…"
+      delay={400}
+      onSearch={handleSearch}
+      autoFocus
+      searchVal={searchVal}
+      setSearchVal={setSearchVal}
+    />
       </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -124,7 +132,6 @@ const App = () => {
       </DndContext>
 
       <div className="mt-4 text-sm text-gray-500">
-        {/* Выбрано: {selectedIds.length} из {storeItems.length} */}
       </div>
 
        {hasMore && (

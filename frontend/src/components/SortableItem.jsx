@@ -7,7 +7,8 @@ export const SortableItem = ({ item, isSelected, toggleSelection }) => {
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition
+    transition,
+    cursor: "pointer"
   };
 
   return (
@@ -21,6 +22,7 @@ export const SortableItem = ({ item, isSelected, toggleSelection }) => {
         type="checkbox"
         checked={isSelected}
         onChange={() => toggleSelection(item.id)}
+         style={{ transform: 'scale(1.4)' }}
       />
       <span className="flex-1 cursor-move" {...attributes} {...listeners}>
         {item.name}
