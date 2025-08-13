@@ -74,11 +74,12 @@ const [searchVal, setSearchVal] = useState(() => {
 
   const toggleSelection = async (id) => {
     await dispatch(selectItems({id, search: searchVal})).unwrap();
-      
-  
   };
 
+  const isSearch = searchVal.trim().length > 0;
+
   const handleDragEnd = async (event) => {
+    if (isSearch) return;
     const { active, over } = event;
     if (active.id !== over?.id) {
       const oldIndex = storeItems.findIndex((i) => i.id === active.id);
@@ -121,6 +122,7 @@ const [searchVal, setSearchVal] = useState(() => {
                 item={item}
                 isSelected={item.isSelected}
                 toggleSelection={toggleSelection}
+                dragDisabled={isSearch}  
               />
             ))}
           </ul>

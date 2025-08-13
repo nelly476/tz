@@ -2,7 +2,7 @@ import { useSortable} from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 
-export const SortableItem = ({ item, isSelected, toggleSelection }) => {
+export const SortableItem = ({ item, isSelected, toggleSelection, dragDisabled }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id });
 
   const style = {
@@ -11,12 +11,15 @@ export const SortableItem = ({ item, isSelected, toggleSelection }) => {
     cursor: "pointer"
   };
 
+   const dragProps = dragDisabled ? {} : { ...attributes, ...listeners };
+
   return (
-    <li
+     <li
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-2 p-2 border rounded 
-      bg-white shadow-sm hover:bg-gray-50"
+      className={`flex items-center gap-2 p-2 border rounded bg-white shadow-sm
+                  ${dragDisabled ? 'cursor-default' : 'cursor-grab hover:bg-gray-50'}`}
+      {...dragProps}
     >
       <input
         type="checkbox"
