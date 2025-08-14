@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import './App.css';
-import { getItems, selectItems, sortItems, moveLocal, selectLocal } from './redux/slices/sessionSlice';
+import { getItems, selectItems, sortItems, sortLocal, selectLocal } from './redux/slices/sessionSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { SortableItem } from './components/SortableItem';
 import { SearchInput } from './components/SearchInput';
@@ -86,7 +86,7 @@ const [searchVal, setSearchVal] = useState(() => {
       const activeId = active.id
       const overId = over.id
 
-      await dispatch(moveLocal({reorderedList}))
+      await dispatch(sortLocal({reorderedList}))
       await dispatch(sortItems({reorderedList, activeId, overId}))
     }
   };
