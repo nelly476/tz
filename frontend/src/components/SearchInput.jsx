@@ -39,7 +39,7 @@ export function SearchInput({
       maxWidth: 420
     }}>
       <input
-        type="search"
+        type="text"
         value={searchVal}
         onChange={(e) => setSearchVal(e.target.value)}
         onKeyDown={onKeyDown}
@@ -66,10 +66,11 @@ export function SearchInput({
             background: 'transparent',
             border: 'none',
             cursor: 'pointer',
-            fontSize: 18,
+            fontSize: 20,
             lineHeight: 1,
           }}
         >
+          X
         </button>
       )}
     </div>
