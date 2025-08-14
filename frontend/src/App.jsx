@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import './App.css';
-import { getItems, selectItems, sortItems } from './redux/slices/sessionSlice';
+import { getItems, selectItems, sortItems, moveLocal, selectLocal } from './redux/slices/sessionSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { SortableItem } from './components/SortableItem';
 import { SearchInput } from './components/SearchInput';
@@ -73,6 +73,7 @@ const [searchVal, setSearchVal] = useState(() => {
 }, [loaderRef]);
 
   const toggleSelection = async (id) => {
+    await dispatch(selectLocal({id}))
     await dispatch(selectItems({id})).unwrap();
   };
 
@@ -82,8 +83,11 @@ const [searchVal, setSearchVal] = useState(() => {
       const oldIndex = storeItems.findIndex((i) => i.id === active.id);
       const newIndex = storeItems.findIndex((i) => i.id === over.id);
       const reorderedList = arrayMove(storeItems, oldIndex, newIndex)
+      const activeId = active.id
+      const overId = over.id
 
-      dispatch(sortItems({reorderedList, active, over}))
+      await dispatch(moveLocal({reorderedList}))
+      await dispatch(sortItems({reorderedList, activeId, overId}))
     }
   };
 
