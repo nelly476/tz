@@ -25,13 +25,13 @@ const App = () => {
   const dispatch = useDispatch();
   const storeItems = useSelector((state) => state.sessionSlice.data);
   const [offset, setOffset] = useState(0);
+  const loaderRef = useRef(null);
+  const isFirstLoad = useRef(true);
+
 const [searchVal, setSearchVal] = useState(() => {
   // читаем из localStorage один раз при инициализации
   return localStorage.getItem('searchVal') ?? '';
 });
-  const loaderRef = useRef(null);
-  const isFirstLoad = useRef(true);
-
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -73,21 +73,17 @@ const [searchVal, setSearchVal] = useState(() => {
 }, [loaderRef]);
 
   const toggleSelection = async (id) => {
-    console.log(searchVal)
-    await dispatch(selectItems({id, search: searchVal})).unwrap();
+    await dispatch(selectItems({id})).unwrap();
   };
 
-  const isSearch = searchVal.trim().length > 0;
-
   const handleDragEnd = async (event) => {
-    if (isSearch) return;
     const { active, over } = event;
     if (active.id !== over?.id) {
       const oldIndex = storeItems.findIndex((i) => i.id === active.id);
       const newIndex = storeItems.findIndex((i) => i.id === over.id);
       const reorderedList = arrayMove(storeItems, oldIndex, newIndex)
 
-      dispatch(sortItems({reorderedList, oldIndex, newIndex}))
+      dispatch(sortItems({reorderedList, active, over}))
     }
   };
 
@@ -123,7 +119,6 @@ const [searchVal, setSearchVal] = useState(() => {
                 item={item}
                 isSelected={item.isSelected}
                 toggleSelection={toggleSelection}
-                dragDisabled={isSearch}  
               />
             ))}
           </ul>

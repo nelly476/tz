@@ -1,41 +1,16 @@
 import { items } from '../data/items.js';
 
 const sessionStore = {
-  data: [],
-  searchData: [],
-  selectedIdsFromSearch: [],
+  data: [...items],
 };
 
 function getPaginatedData(offset, limit, search) {
-  let data
-
   if (search) {
-    data = [...items].filter(item => item.name.includes(search)).map(item => {
-      const sessionStoreItem = sessionStore.data.find(i => i.id === item.id)
-      if (sessionStoreItem) {
-        return sessionStoreItem
-      } else {
-        return item
-      }
-    })
-
-  } else {
-    if (sessionStore.data.length > offset) {
-    data =  sessionStore.data
-  } else {
-    data = [...items]
-  }
+    return sessionStore.data.filter(item => item.name.includes(search)).slice(offset, offset + limit)
   }
 
-  return data
+  return sessionStore.data
     .slice(offset, offset + limit)
-    .map(item => {
-      if (sessionStore.selectedIdsFromSearch.includes(item.id)) {
-        return {...item, isSelected: true}
-      } else {
-        return item
-      }
-    })
 }
 
 export const getItems = (req, res) => {
@@ -45,70 +20,27 @@ export const getItems = (req, res) => {
 
   let paginated = getPaginatedData(offset, limit, search)
 
-  if (!search) {
-      if (sessionStore.data.length <= offset) {
-    sessionStore.data = [...sessionStore.data, ...paginated]
-  }
-  } else {
-    if (offset === 0) {
-      sessionStore.searchData = []
-    }
-
-    if (sessionStore.searchData.length <= offset) {
-    sessionStore.searchData = [...sessionStore.searchData, ...paginated]
-  }
-  }
-
     res.json(paginated)
   
 }
 
 export const updateSelection = (req, res) => {
-  const {id, search} = req.body;
-  // console.log(search)
- 
-  if (search.length > 0) {
-    sessionStore.searchData = sessionStore.searchData.map(item => {
-      if (item.id === id) {
-        return {...item, isSelected: !item.isSelected}
-      } else {
-        return item
-      }
-    })
-    const indexInData = sessionStore.data.findIndex(item => item.id === id)
-    if (indexInData >= 0) {
-      sessionStore.data[indexInData].isSelected = !sessionStore.data[indexInData].isSelected
-    } else {
-      if (sessionStore.selectedIdsFromSearch.includes(id)) {
-        sessionStore.selectedIdsFromSearch = sessionStore.selectedIdsFromSearch.filter(i => i !== id)
-      } else {
-          sessionStore.selectedIdsFromSearch = [...sessionStore.selectedIdsFromSearch, id]
+  const {id} = req.body;
 
-      }
-    }
-    res.json(sessionStore.searchData) 
+  const targetIndex = sessionStore.data.findIndex(item => item.id === id)
+  const targeItem = sessionStore.data[targetIndex]
+  sessionStore.data[targetIndex] = {...targeItem, isSelected: !targeItem.isSelected}
 
-} else {
-            // console.log(sessionStore.data)   
-    sessionStore.data = sessionStore.data.map(item => {
-    if (item.id === id) {
-      return {...item, isSelected: !item.isSelected}
-    } else {
-      return item
-    }
-    
-  })
-
-
-  res.json(sessionStore.data)
-}
+  res.json(id)
   }
 
 export const updateSorting = (req, res) =>  {
-  const {reorderedList} = req.body
+  const {reorderedList, active, over} = req.body
+  const fromIndex = sessionStore.data.findIndex(item => item.id === active.id)
+  const toIndex = sessionStore.data.findIndex(item => item.id === over.id)
 
-  sessionStore.data = reorderedList
+  const item = sessionStore.data.splice(fromIndex, 1)[0];
+  sessionStore.data.splice(toIndex, 0, item);
 
-  res.json(sessionStore.data)
-
+  res.json(reorderedList)
 }

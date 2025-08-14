@@ -11,15 +11,15 @@ export const getItems = createAsyncThunk(
   }
 );
 
-export const selectItems = createAsyncThunk('items/select', async ({id, search}) => {
-  const res = await axiosInstance.post('/select', { id, search });
+export const selectItems = createAsyncThunk('items/select', async ({id}) => {
+  const res = await axiosInstance.post('/select', { id });
   return res.data; 
 });
 
 export const sortItems = createAsyncThunk(
   'items/sort',
-  async ({ reorderedList}) => {
-    const res = await axiosInstance.post('/sort', { reorderedList });
+  async ({ reorderedList, active, over}) => {
+    const res = await axiosInstance.post('/sort', { reorderedList, active, over });
     return res.data; 
   }
 );
@@ -54,16 +54,15 @@ const sessionSlice = createSlice({
       })
       .addCase(selectItems.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.data = action.payload
-        
+        const targetIndex = state.data.findIndex(item => item.id === action.payload)
+        state.data[targetIndex] = {...state.data[targetIndex], isSelected: !state.data[targetIndex].isSelected}
       })
       .addCase(selectItems.rejected, (state) => {
         state.status = 'failed';
       })
 
- .addCase(sortItems.fulfilled, (state, action) => {
+      .addCase(sortItems.fulfilled, (state, action) => {
   state.status = 'succeeded';
-
   state.data = action.payload
 
 });

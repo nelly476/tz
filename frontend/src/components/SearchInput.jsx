@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export function SearchInput({
   placeholder = 'Поиск…',
-  defaultValue = '',
   delay = 400,             // дебаунс в мс
   onSearch,                // (query: string) => void
   autoFocus = false,
